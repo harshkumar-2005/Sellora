@@ -26,7 +26,6 @@ export const isAuthenticated = (req, res, next) => {
         next();
 
     } catch (error) {
-        console.log(error);
         return res.status(401).json({
             sucess: false,
             message: 'Token is invalid or expired'
