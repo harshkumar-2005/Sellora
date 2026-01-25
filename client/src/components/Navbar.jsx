@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/selloraLogo.jpg";
+import { useAuth } from "../context/AuthContext";
+
 
 function Navbar() {
   const [showNavbar, setShowNavbar] = useState(true);

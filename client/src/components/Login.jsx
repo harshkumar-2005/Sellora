@@ -1,47 +1,42 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Navbar from "./Navbar.jsx";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = "http://localhost:3000";  // take this in .env in prod url
 
 function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("user");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
-  const sendCredentials = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      const response = await axios.post(
-        "http://192.168.0.100:3000/v1/api/auth/login",
-        { email, password, role },
+      const res = await axios.post(
+        `${API_URL}/v1/api/auth/login`,
+        { email, password },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
-      // console.log(response.data);
-      setSuccess(response.data.message);
-      setError(""); // clear error on success
+      // Store JWT and update global auth state
+      login(res.data.token);
+
+      // Redirect after successful login
+      navigate("/");
 
     } catch (err) {
-      setSuccess("");
-      if (err.response) {
-        // Backend error (400, 401, etc.)
-        setError(err.response.data.message);
-      } else {
-        // Network / server issue
-        setError("Unable to connect to server");
-      }
+      setError(err.response?.data?.message || "Unable to connect to server");
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    sendCredentials();
   };
 
   return (
@@ -87,29 +82,9 @@ function Login() {
               </div>
             </label>
 
-            <label className="flex flex-col gap-2 font-medium">
-              Role:
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="p-2 rounded-md"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
-            </label>
-
-            {/* Error Message */}
             {error && (
               <div className="text-red-600 font-semibold text-center">
                 {error}
-              </div>
-            )}
-
-            {/* Sucess Message */}
-            {success && (
-              <div className='text-green-600 font-semibold text-center'>
-                {success}
               </div>
             )}
 

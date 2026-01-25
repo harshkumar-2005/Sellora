@@ -2,54 +2,43 @@ import { useState } from "react";
 import Navbar from "./Navbar.jsx";
 import { Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+
+const API_URL = "http://localhost:3000"; // take this in .env in prod url
 
 function Signup() {
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState("user");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const sendCredentials = async () => {
-    const newCredentials = { firstName, email, password, role };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/v1/api/auth/signup",
-        newCredentials,
+      await axios.post(
+        `${API_URL}/v1/api/auth/signup`,
+        { firstName, email, password },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
         }
       );
 
-      // console.log(response.data);
       setError("");
-      setSuccess("Account created successfully");
+      setSuccess("Account created successfully. Redirecting to login...");
 
-      // clear form
-      setFirstName("");
-      setEmail("");
-      setPassword("");
-      setRole("user");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
 
     } catch (err) {
       setSuccess("");
-
-      if (err.response) {
-        setError(err.response.data.message);
-      } else {
-        setError("Unable to connect to server");
-      }
+      setError(err.response?.data?.message || "Unable to connect to server");
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    sendCredentials();
   };
 
   return (
@@ -107,26 +96,12 @@ function Signup() {
               </div>
             </label>
 
-            <label className="flex flex-col gap-2 font-medium">
-              Role:
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="p-2 rounded-md"
-              >
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-              </select>
-            </label>
-
-            {/* Error Message */}
             {error && (
               <div className="text-red-600 font-semibold text-center">
                 {error}
               </div>
             )}
 
-            {/* Success Message */}
             {success && (
               <div className="text-green-600 font-semibold text-center">
                 {success}
