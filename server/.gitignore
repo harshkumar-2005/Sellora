@@ -7,7 +7,7 @@
 /coverage
 
 # TypeScript cache
-.tsbuildinfo
+tsconfig.tsbuildinfo
 
 # Environment variables
 .env
