@@ -1,2 +1,25 @@
+# Dependencies
 /node_modules
+
+# Distribution/Build files
+/dist
+/build
+/coverage
+
+# TypeScript cache
+.tsbuildinfo
+
+# Environment variables
 .env
+.env.development
+.env.production
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
