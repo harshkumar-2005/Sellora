@@ -14,6 +14,10 @@
 .env.development
 .env.production
 
+# Ignore compiled config files in root
+prisma.config.js
+prisma.config.js.map
+
 # IDE and editor files
 .idea/
 .vscode/
