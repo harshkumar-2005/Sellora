@@ -1,24 +1,51 @@
 import { Request, Response, NextFunction } from "express";
 
-/**
- * Middleware to log the response time, status code, and method of an incoming request.
- */
+/* ANSI color helpers */
+const colors = {
+  reset: "\x1b[0m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  red: "\x1b[31m",
+  cyan: "\x1b[36m",
+};
+
 export const responseTime = (req: Request, res: Response, next: NextFunction): void => {
-    // Record the high-resolution start time
-    const start = Date.now();
+  const start = process.hrtime.bigint();
 
-    // The 'finish' event fires when the response has been sent to the client
-    res.on("finish", () => {
-        const duration = Date.now() - start;
-        const status = res.statusCode;
+  res.on("finish", () => {
+    const end = process.hrtime.bigint();
+    const duration = Number(end - start) / 1_000_000;
 
-        // Determine success based on HTTP status codes
-        const isSuccess = status >= 200 && status < 400;
-        const symbol = isSuccess ? "✔" : "✘";
+    const status = res.statusCode;
+    const method = req.method;
+    const url = req.originalUrl || req.url;
+    const ip = req.ip || req.socket.remoteAddress;
+    const userAgent = req.headers["user-agent"] || "unknown";
+    const contentLength = res.getHeader("content-length") || 0;
 
-        // Structured log output
-        console.log(`${req.method} ${req.originalUrl || req.url} ${symbol} ${status} - ${duration}ms`);
-    });
+    let color = colors.green;
+    let symbol = "✔";
 
-    next();
+    if (status >= 400 && status < 500) {
+      color = colors.yellow;
+      symbol = "⚠";
+    }
+
+    if (status >= 500) {
+      color = colors.red;
+      symbol = "✘";
+    }
+
+    const time = new Date().toISOString();
+
+    console.log(
+      `${colors.cyan}[${time}]${colors.reset} ${method} ${url} ` +
+      `${color}${symbol} ${status}${colors.reset} ` +
+      `${duration.toFixed(2)}ms ` +
+      `size:${contentLength} ` +
+      `ip:${ip}`
+    );
+  });
+
+  next();
 };
