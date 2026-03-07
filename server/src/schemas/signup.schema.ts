@@ -2,11 +2,11 @@
 
 import { z } from "zod";
 
-const userSchema = z.object({
+const signupSchema = z.object({
   email: z.email(),
   password: z.string().min(6),
   name: z.string().min(3),
   phoneNumber: z.string().min(10),
 });
 
-export default userSchema;
+export default signupSchema;
