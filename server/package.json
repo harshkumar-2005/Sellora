@@ -27,7 +27,9 @@
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.4.2",
     "@prisma/client": "^7.4.2",
+    "@types/cookie-parser": "^1.4.10",
     "argon2": "^0.44.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
