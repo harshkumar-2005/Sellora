@@ -1,6 +1,7 @@
 import prisma from "../lib/prisma.js";
 import argon2 from "argon2";
 import jwt from "jsonwebtoken";
+import envconfig from "../config/env.config.js";
 
 interface SignupInput {
   email: string;
@@ -116,4 +117,53 @@ export const getUserService = async (userId: number) => {
   }
 
   return user;
+};
+
+export const refreshTokenService = async (token: string) => {
+  const decoded: any = jwt.verify(token, process.env.REFRESH_SECRET!);
+
+  const tokens = await prisma.refreshToken.findMany({
+    where: { userId: decoded.userId },
+  });
+
+  // compare hashes
+  const validToken = await Promise.all(
+    tokens.map(async (t) => {
+      const isValid = await argon2.verify(t.token, token);
+      return isValid ? t : null;
+    }),
+  );
+
+  // if no valid token found
+  if (!validToken.some((t) => t !== null)) {
+    throw new Error("INVALID_TOKEN");
+  }
+
+  const accessToken = jwt.sign(
+    { userId: decoded.userId },
+    process.env.ACCESS_SECRET!,
+    { expiresIn: "15m" },
+  );
+
+  return accessToken;
+};
+
+export const logoutService = async (token: string) => {
+
+ const decoded: any = jwt.verify(token, envconfig.refreshSecret!)
+
+ const tokens = await prisma.refreshToken.findMany({
+  where: { userId: decoded.userId }
+ })
+
+ for (const t of tokens) {
+   const valid = await argon2.verify(t.token, token)
+
+   if(valid){
+     await prisma.refreshToken.delete({
+       where: { id: t.id }
+     })
+     break
+   }
+ }
 };
