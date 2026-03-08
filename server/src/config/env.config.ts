@@ -1,10 +1,10 @@
 import "dotenv/config";
 
-const config = {
+const envconfig = {
   port: process.env.PORT || 3000,
   dburl: process.env.DATABASE_URL,
-  accessSecert: process.env.ACCESS_SECRET,
-  refreshSecert: process.env.REFRESH_SECRET,
+  accessSecret: process.env.ACCESS_SECRET,
+  refreshSecret: process.env.REFRESH_SECRET,
 };
 
-export default config;
+export default envconfig;
