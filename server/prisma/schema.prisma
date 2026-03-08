@@ -28,6 +28,8 @@ model Product {
   description String?
   price       Float
   stock       Int
+  imageUrl    String? // optional
+  category    String? // optional
 
   createdAt DateTime @default(now())
 
