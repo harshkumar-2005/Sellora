@@ -93,8 +93,8 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-// getme route function
-export const getme = async (req: AuthRequest, res: Response) => {
+// profile route function
+export const profile = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({
