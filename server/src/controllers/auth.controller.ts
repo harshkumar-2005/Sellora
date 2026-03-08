@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../types/express.types.js";
-import { signupUserService,loginUserService,getUserService } from "../services/auth.service.js";
+import { signupUserService,loginUserService,getUserService, refreshTokenService, logoutService } from "../services/auth.service.js";
 import signupSchema from "../validators/signup.schema.js";
 import loginSchema from "../validators/login.schema.js";
 import { ZodError } from "zod";
@@ -117,4 +117,35 @@ export const getme = async (req: AuthRequest, res: Response) => {
       message: "Server error",
     });
   }
+};
+
+// refresh token route function
+export const refresh = async (req: Request, res: Response) => {
+  const token = req.cookies.refreshToken;
+
+  if (!token) return res.status(401).json({ message: "No token" });
+
+  const accessToken = await refreshTokenService(token);
+
+  res.status(201).json({ accessToken });
+};
+
+// logout route function 
+export const logout = async (req: AuthRequest, res: Response) => {
+  const token = req.cookies.refreshToken;
+
+  if (!token) {
+    return res.status(400).json({
+      success: false,
+      message: "Token is not provided"
+    });
+  }
+ 
+  const logout = await logoutService(token);
+  res.clearCookie("refreshToken");
+  res.clearCookie("accessToken"); 
+  return res.status(200).json({
+    success: true,
+    message: "Logout successfully"
+  });
 };
