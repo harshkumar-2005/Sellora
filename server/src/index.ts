@@ -1,4 +1,4 @@
-import "dotenv/config";
+import envconfig from "./config/env.config.js";
 import express, { Application } from "express";
 import cors from "cors";
 import helmetConfig from "./config/helmet.config.js"
@@ -10,7 +10,7 @@ import { responseTime } from "./middleware/response.time.js";
 import apiRouter from "./routes/index.js"; // The "Master" router
 
 const app: Application = express();
-const PORT = process.env.PORT || 3000;
+const PORT = envconfig.port;
 
 // 1. Global Middleware
 app.use(helmetConfig);
