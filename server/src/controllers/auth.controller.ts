@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
-import { signupUserService, loginUserService } from "../services/auth.service.js";
-import userSchema from "../schemas/signup.schema.js";
-import loginSchema from "../schemas/login.schema.js";
+import { AuthRequest } from "../types/express.types.js";
+import { signupUserService,loginUserService,getUserService } from "../services/auth.service.js";
+import signupSchema from "../validators/signup.schema.js";
+import loginSchema from "../validators/login.schema.js";
 import { ZodError } from "zod";
 
 // signup route function
 export const signup = async (req: Request, res: Response) => {
   try {
     // zod validation
-    const validUser = userSchema.parse(req.body);
+    const validUser = signupSchema.parse(req.body);
 
     // creating user if not exist
     const user = await signupUserService(validUser);
@@ -46,12 +47,20 @@ export const login = async (req: Request, res: Response) => {
     const { accessToken, refreshToken, user } =
       await loginUserService(validUser);
 
-    // setting refreshToken as cookie at client
+    // setting refreshToken as cookie
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    //setting accessToken as cookie
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 15 * 60 * 1000,
     });
 
     // response
@@ -85,8 +94,27 @@ export const login = async (req: Request, res: Response) => {
 };
 
 // getme route function
-export const getme = (req: Request, res: Response) => {
-  res.status(200).json({
-    success: true,
-  });
+export const getme = async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const userId = req.user.userId;
+
+    const user = await getUserService(userId);
+
+    return res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
 };
