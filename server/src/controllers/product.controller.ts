@@ -47,7 +47,7 @@ export const getProductById = async (req: Request, res: Response) => {
 };  
   
 // Admin route
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: AuthRequest, res: Response) => {
   try {
     const product = await createProductService(req.body);
 
@@ -64,7 +64,7 @@ export const createProduct = async (req: Request, res: Response) => {
 };
 
 // Admin route
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: AuthRequest, res: Response) => {
   try {
     const id = Number(req.params.id);
 
