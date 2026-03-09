@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../types/express.types.js";
 import { signupUserService,loginUserService,getUserService, refreshTokenService, logoutService } from "../services/auth.service.js";
-import signupSchema from "../validators/signup.schema.js";
-import loginSchema from "../validators/login.schema.js";
+import signupSchema from "../validators/signup.validator.js";
+import loginSchema from "../validators/login.validator.js";
 import { ZodError } from "zod";
 
 // signup route function
