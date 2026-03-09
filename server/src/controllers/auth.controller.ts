@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../types/express.types.js";
 import { signupUserService,loginUserService,getUserService, refreshTokenService, logoutService } from "../services/auth.service.js";
-import signupSchema from "../validators/signup.validator.js";
-import loginSchema from "../validators/login.validator.js";
+import validSignup from "../validators/signup.validator.js";
+import validLogin from "../validators/login.validator.js";
 import { ZodError } from "zod";
 
 // signup route function
 export const signup = async (req: Request, res: Response) => {
   try {
     // zod validation
-    const validUser = signupSchema.parse(req.body);
+    const validUser = validSignup.parse(req.body);
 
     // creating user if not exist
     const user = await signupUserService(validUser);
@@ -41,7 +41,7 @@ export const signup = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     // zod validation
-    const validUser = loginSchema.parse(req.body);
+    const validUser = validLogin.parse(req.body);
 
     // checking credentials and then creating & saving refresh token in db
     const { accessToken, refreshToken, user } =
