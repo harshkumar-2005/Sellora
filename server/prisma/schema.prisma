@@ -49,6 +49,7 @@ model CartItem {
   addedAt DateTime @default(now())
 
   @@unique([userId, productId])
+  @@index([userId]) // for faste queries by user
 }
 
 model RefreshToken {
