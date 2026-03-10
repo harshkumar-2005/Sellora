@@ -12,7 +12,7 @@ import apiRouter from "./routes/index.js"; // The "Master" router
 const app: Application = express();
 const PORT = envconfig.port;
 
-// 1. Global Middleware
+// Global Middleware
 app.use(helmetConfig);
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -25,10 +25,10 @@ app.get("/health", (req, res) => {
   res.status(200).json({ success: true, message: "Server is healthy" });
 });
 
-// 3. API Routes (Versioned)
+// API Routes (Versioned)
 app.use("/v1/api", apiRouter);
 
-// 4. Start Server
+// Start Server
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

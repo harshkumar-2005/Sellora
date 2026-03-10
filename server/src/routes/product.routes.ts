@@ -6,6 +6,8 @@ import validatedProduct from "../middleware/validProduct.middleware.js";
 
 const router = express.Router();
 
+// /v1/api/auth/products
+
 // public routes
 router.get("/", getProducts);
 router.get("/:id", getProductById);
