@@ -81,7 +81,7 @@ export const getCartItems = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const updateCartItem = async (req: AuthRequest, res: Response) => {
+export const updateCartItemById = async (req: AuthRequest, res: Response) => {
   // zod validation
   const validCartItem = updateCartValidator.parse(req.body);
   const userId = req.user!.userId;
@@ -121,7 +121,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const removeCartItem = async (req: AuthRequest, res: Response) => {
+export const removeCartItemById = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user!.userId;
     const productId = Number(req.params.productId);
