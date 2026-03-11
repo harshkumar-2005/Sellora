@@ -27,9 +27,27 @@ export const getReviewsByProductId = async(req: AuthRequest, res: Response) => {
 }
 
 export const updateReview = async(req: AuthRequest, res: Response)=>{
+    const reviewId = Number(req.params.reviewId);
+    const { rating, comment } = req.body;
+    const userId = req.user!.userId;
+
+    try {
+        const review = await updateReviewService(reviewId, userId, rating, comment);
+        res.status(200).json({ success: true, review });
+    } catch (err: any) {
+        res.status(500).json({ success: false, message: "Failed to update review", error: err.message });
+    }
 
 }
 
 export const deleteReview = async(req: AuthRequest, res: Response)=>{
+    const userId = req.user!.userId;
+    const reviewId = Number(req.params.reviewId);
 
+    try {
+        const review = await deleteReviewService(reviewId, userId);
+        res.status(200).json({ success: true, review });
+    } catch (err: any) {
+        res.status(500).json({ success: false, message: "Failed to delete review", error: err.message });
+    }
 }
