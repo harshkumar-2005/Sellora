@@ -19,6 +19,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   cartItems     CartItem[]
+  wishlistItems WishlistItem[]
   refreshTokens RefreshToken[]
   orders Order[]
 
@@ -38,6 +39,7 @@ model Product {
   updatedAt DateTime @updatedAt
 
   cartItems CartItem[]
+  wishlistItems WishlistItem[]
   orderItems OrderItem[]
 
   @@index([category])
@@ -97,6 +99,21 @@ model OrderItem {
 
   @@index([orderId])
   @@index([productId])
+}
+
+model WishlistItem {
+  id Int @id @default(autoincrement())
+
+  userId    Int
+  productId Int
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  addedAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@index([userId])
 }
 
 enum OrderStatus {
