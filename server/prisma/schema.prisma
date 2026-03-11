@@ -21,7 +21,8 @@ model User {
   cartItems     CartItem[]
   wishlistItems WishlistItem[]
   refreshTokens RefreshToken[]
-  orders Order[]
+  orders        Order[]
+  reviews       Review[]
 
   @@index([email])
 }
@@ -37,10 +38,14 @@ model Product {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  averageRating Float @default(0)
+  reviewCount   Int   @default(0)
 
-  cartItems CartItem[]
+  cartItems     CartItem[]
   wishlistItems WishlistItem[]
-  orderItems OrderItem[]
+  orderItems    OrderItem[]
+  reviews       Review[]
+
 
   @@index([category])
 }
@@ -114,6 +119,24 @@ model WishlistItem {
 
   @@unique([userId, productId])
   @@index([userId])
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+
+  rating    Int
+  comment   String?
+
+  userId    Int
+  productId Int
+
+  user      User     @relation(fields: [userId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId]) // one review per user per product
 }
 
 enum OrderStatus {
