@@ -4,9 +4,12 @@ import { createReview, getReviewsByProductId, updateReview, deleteReview } from 
 
 const router = express.Router();
 
+router.get("/:productId/reviews", getReviewsByProductId);
+
 router.use(protectRoute);
 
-router.post("/:productId", createReview);
-router.get("/:productId", getReviewsByProductId);
-router.put("/:reviewId", updateReview);
-router.delete("/:reviewId", deleteReview);
+router.post("/:productId/reviews", createReview);
+router.put("/reviews/:reviewId", updateReview);
+router.delete("/reviews/:reviewId", deleteReview);
+
+export default router;
