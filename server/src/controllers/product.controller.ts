@@ -1,15 +1,19 @@
 import { AuthRequest } from "../types/express.types.js";
 import { Request, Response } from "express";
-import {createProductService, getProductService, getProductByIdService, updateProductService, deleteProductService} from "../services/product.service.js";
+import {createProductService, getProductService, getProductByIdService, updateProductService, deleteProductService, getAdminProductsService} from "../services/product.service.js";
 
 // public routes
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const products = await getProductService();
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+
+    const {data, pagination } = await getProductService(page, limit);
 
     res.json({
       success: true,
-      products,
+      products: data,
+      pagination
     });
   } catch (err: any) {
     res.status(500).json({
@@ -93,6 +97,26 @@ export const deleteProduct = async (req: AuthRequest, res: Response) => {
     res.json({
       success: true,
       message: "Product deleted",
+    });
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      err: err.message,
+    });
+  }
+};
+
+export const getAdminProducts = async (req: AuthRequest, res: Response) => {
+  try {
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
+
+    const products = await getAdminProductsService(page, limit);
+    res.json({
+      success: true,
+      products: products.data,
+      pagination: products.pagination
     });
   } catch (err: any) {
     res.status(500).json({
