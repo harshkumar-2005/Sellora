@@ -1,7 +1,7 @@
 import express from "express";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import { adminOnly } from "../middleware/adminCheck.middleware.js";
-import { checkout, getOrderById, getOrderUser, getAllOrders, updateStatus } from "../controllers/order.controller.js";
+import { checkout, getOrderById, getUserOrders, getAllOrders, updateStatus } from "../controllers/order.controller.js";
 
 const router = express.Router();
 
@@ -9,7 +9,7 @@ const router = express.Router();
 
 // pubic routes
 router.post('/', protectRoute, checkout);
-router.get('/', protectRoute, getOrderUser);
+router.get('/', protectRoute, getUserOrders);
 
 // admin routes
 router.get('/admin/orders', protectRoute, adminOnly, getAllOrders);

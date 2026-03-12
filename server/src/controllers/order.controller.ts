@@ -3,7 +3,7 @@ import { Response } from "express";
 import {
   checkoutService,
   getOrderByIdService,
-  getOrderUserService,
+  getUserOrdersService,
   getAllOrdersAdminService,
   updateOrderStatusService,
 } from "../services/order.service.js";
@@ -44,23 +44,20 @@ export const checkout = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const getOrderUser = async (req: AuthRequest, res: Response) => {
-  const userId = req.user?.userId;
+export const getUserOrders = async (req: AuthRequest, res: Response) => {
 
-  if (!userId) {
-    return res.status(401).json({
-      success: false,
-      message: "Unauthorized",
-    });
-  }
+  const userId: number = req.user!.userId;
+  const page: number = Number(req.query.page) || 1;
+  const limit: number = Number(req.query.limit) || 10;
 
   try {
-    const orders = await getOrderUserService(userId!);
+    const {data, pagination} = await getUserOrdersService(userId!,page, limit);
 
     res.status(200).json({
       success: true,
       message: "Order found",
-      orders,
+      orders: data,
+      pagination
     });
   } catch (err: any) {
     res.status(500).json({
@@ -107,21 +104,17 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
 
 export const getAllOrders = async(req: AuthRequest, res: Response)=>{
   try {
-    const allOrders = await getAllOrdersAdminService();
+    const page: number = Number(req.query.page) || 1;
+    const limit: number = Number(req.query.limit) || 10;
+    const { data, pagination } = await getAllOrdersAdminService(page, limit);
 
-        res.status(200).json({
+    res.status(200).json({
       success: true,
       message: "Order found",
-      allOrders
-        });
+      orders: data,
+      pagination
+    });
   }catch(err: any){
-    if(err.message === "Error while getting all orders."){
-      return res.status(404).json({
-        success: false,
-        message: err.message
-      })
-    }
-
     res.status(500).json({
       success: false,
       message: "Server error"

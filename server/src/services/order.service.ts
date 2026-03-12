@@ -1,5 +1,6 @@
 import { OrderStatus } from "@prisma/client";
 import prisma from "../lib/prisma.js";
+import getPagination from "../utils/pagination.util.js";
 
 export const checkoutService = async (userId: number) => {
   const cartItems = await prisma.cartItem.findMany({
@@ -46,14 +47,39 @@ export const checkoutService = async (userId: number) => {
   return order;
 };
 
-export const getOrderUserService = async (userId: number) => {
+export const getUserOrdersService = async (userId: number, page: number, limit: number) => {
+
+  const { pages, limits, skip } = getPagination(page, limit);
+
   const orders = await prisma.order.findMany({
     where: {
-      userId: userId,
+      userId
     },
+    skip,
+    take: limits,
+    orderBy: {
+      createdAt: "desc"
+    },
+    include: {
+      items: true
+    }
   });
 
-  return orders;
+  const totalOrders = await prisma.order.count({
+    where: {
+      userId
+    }
+  });
+
+  return {
+    data: orders,
+    pagination: {
+      page: pages,
+      limit: limits,
+      total: totalOrders,
+      totalPages: Math.ceil(totalOrders / limits)
+    }
+  };
 };
 
 export const getOrderByIdService = async (
@@ -75,15 +101,37 @@ export const getOrderByIdService = async (
   return order;
 };
 
-export const getAllOrdersAdminService = async ()=>{
-    const allOrders = await prisma.order.findMany({});
-    return allOrders;
-}
+export const getAllOrdersAdminService = async (page: number, limit: number) => {
 
-export const updateOrderStatusService = async (
-  orderId: number,
-  status: OrderStatus,
-) => {
+  const { pages, limits, skip } = getPagination(page, limit);
+
+  const orders = await prisma.order.findMany({
+    skip,
+    take: limits,
+    orderBy: {
+      createdAt: "desc"
+    },
+    include: {
+      items: true,
+      user: true
+    }
+  });
+
+  const totalOrders = await prisma.order.count();
+
+  return {
+    data: orders,
+    pagination: {
+      page: pages,
+      limit: limits,
+      total: totalOrders,
+      totalPages: Math.ceil(totalOrders / limits)
+    }
+  };
+};
+
+export const updateOrderStatusService = async (orderId: number, status: OrderStatus) => {
+
   if (!Object.values(OrderStatus).includes(status)) {
   throw new Error("Invalid order status");
 }
