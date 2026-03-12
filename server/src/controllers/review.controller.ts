@@ -15,16 +15,32 @@ export const createReview = async (req: AuthRequest, res: Response) => {
     }
 }
 
-export const getReviewsByProductId = async(req: AuthRequest, res: Response) => {
-    const productId = Number(req.params.productId);
+export const getReviewsByProductId = async (req: AuthRequest, res: Response) => {
 
-    try {
-        const reviews = await getReviewsByProductIdService(productId);
-        res.status(200).json({ success: true, reviews });
-    } catch (err: any) {
-        res.status(500).json({ success: false, message: "Failed to fetch reviews", error: err.message });
-    }
-}
+  const productId = Number(req.params.productId);
+  const page = Number(req.query.page);
+  const limit = Number(req.query.limit);
+
+  try {
+
+    const { data, pagination } = await getReviewsByProductIdService(productId, page, limit);
+
+    res.status(200).json({
+      success: true,
+      reviews: data,
+      pagination
+    });
+
+  } catch (err: any) {
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch reviews",
+      error: err.message
+    });
+
+  }
+};
 
 export const updateReview = async(req: AuthRequest, res: Response)=>{
     const reviewId = Number(req.params.reviewId);
