@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import getPagination from "../utils/pagination.util.js";
 
 async function updateProductRating(productId: number) {
   const stats = await prisma.review.aggregate({
@@ -61,19 +62,32 @@ export const createReviewService = async (
   return review;
 };
 
-export const getReviewsByProductIdService = (productId: number) => {
-  return prisma.review.findMany({
+export const getReviewsByProductIdService = async (productId: number, page: number, limit: number) => {
+
+  const { pages, limits, skip } = getPagination(page, limit);
+
+  const reviews = await prisma.review.findMany({
     where: { productId },
-    orderBy: { createdAt: "desc" },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+    skip,
+    take: limits,
+    orderBy: {
+      createdAt: "desc"
+    }
   });
+
+  const totalReviews = await prisma.review.count({
+    where: { productId }
+  });
+
+  return {
+    data: reviews,
+    pagination: {
+      page: pages,
+      limit: limits,
+      total: totalReviews,
+      totalPages: Math.ceil(totalReviews / limits)
+    }
+  };
 };
 
 export const updateReviewService = async (
