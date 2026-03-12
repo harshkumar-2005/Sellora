@@ -1,5 +1,5 @@
 import express from "express";
-import {getProducts,getProductById,createProduct,updateProduct, deleteProduct } from "../controllers/product.controller.js";
+import {getProducts,getProductById,createProduct,updateProduct, deleteProduct, getAdminProducts } from "../controllers/product.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import { adminOnly } from "../middleware/adminCheck.middleware.js";
 import validatedProduct from "../middleware/validProduct.middleware.js";
@@ -16,5 +16,15 @@ router.get("/:id", getProductById);
 router.post("/", protectRoute, adminOnly, validatedProduct, createProduct);
 router.patch("/:id", protectRoute, adminOnly, validatedProduct, updateProduct);
 router.delete("/:id", protectRoute, adminOnly, deleteProduct);
+router.get("/admin/products", protectRoute, adminOnly, getAdminProducts);
+
+// Filtering
+// /products?category=electronics
+
+// Search
+// /products?search=iphone
+
+// Sorting
+// /products?sort=price_asc
 
 export default router;
