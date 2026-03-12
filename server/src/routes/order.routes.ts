@@ -5,6 +5,8 @@ import { checkout, getOrderById, getOrderUser, getAllOrders, updateStatus } from
 
 const router = express.Router();
 
+// /v1/api/orders
+
 // pubic routes
 router.post('/', protectRoute, checkout);
 router.get('/', protectRoute, getOrderUser);

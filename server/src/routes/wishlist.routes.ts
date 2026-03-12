@@ -4,6 +4,8 @@ import { protectRoute } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+// /v1/api/wishlist
+
 // Apply authentication middleware to all routes in this router
 router.use(protectRoute); 
 
