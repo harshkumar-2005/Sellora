@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import getPagination from "../utils/pagination.util.js";
 
 type ProductInput = {
   name: string
@@ -13,14 +14,29 @@ export const createProductService = async (data: ProductInput) => {
   });
 };
 
-export const getProductService = async () => {
-    const product = prisma.product.findMany();
+export const getProductService = async (page: number, limit: number) => {
 
-      if (!product) {
-    throw new Error("Product not found");
-  }
+  const { pages, limits, skip } = getPagination(page, limit);
 
-    return product;
+  const products = await prisma.product.findMany({
+    skip,
+    take: limits,
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  const totalProducts = await prisma.product.count();
+
+  return {
+    data: products,
+    pagination: {
+      page: pages,
+      limit: limits,
+      total: totalProducts,
+      totalPages: Math.ceil(totalProducts / limits)
+    }
+  };
 };
 
 export const getProductByIdService = async (id: number) => {
@@ -62,4 +78,28 @@ export const deleteProductService = async (id: number) => {
   return prisma.product.delete({
     where: { id },
   });
+};
+
+export const getAdminProductsService = async (page: number, limit: number) => {
+
+  const { pages, limits, skip } = getPagination(page, limit);
+  const products = await prisma.product.findMany({
+    skip,
+    take: limits,
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  const totalProducts = await prisma.product.count();
+
+  return {
+    data: products,
+    pagination: {
+      page: pages,
+      limit: limits,
+      total: totalProducts,
+      totalPages: Math.ceil(totalProducts / limits)
+    }
+  };
 };
