@@ -11,8 +11,11 @@ const router = express.Router();
 router.get("/", getProducts);
 
 router.get("/admin/products", protectRoute, adminOnly, getAdminProducts);
+
 router.post("/", protectRoute, adminOnly, validatedProduct, createProduct);
+
 router.patch("/:id", protectRoute, adminOnly, validatedProduct, updateProduct);
+
 router.delete("/:id", protectRoute, adminOnly, deleteProduct);
 
 router.get("/:id", getProductById);
