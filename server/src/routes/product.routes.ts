@@ -18,13 +18,4 @@ router.patch("/:id", protectRoute, adminOnly, validatedProduct, updateProduct);
 router.delete("/:id", protectRoute, adminOnly, deleteProduct);
 router.get("/admin/products", protectRoute, adminOnly, getAdminProducts);
 
-// Filtering
-// /products?category=electronics
-
-// Search
-// /products?search=iphone
-
-// Sorting
-// /products?sort=price_asc
-
 export default router;

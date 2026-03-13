@@ -14,19 +14,48 @@ export const createProductService = async (data: ProductInput) => {
   });
 };
 
-export const getProductService = async (page: number, limit: number) => {
+export const getProductService = async (page: number, limit: number, category?: string, search?: string, sort?: string) => {
 
   const { pages, limits, skip } = getPagination(page, limit);
 
+  const where: any = {};
+
+  // category filter
+  if (category) {
+    where.category = category;
+  }
+
+  // search filter
+  if (search) {
+    where.name = {
+      contains: search,
+      mode: "insensitive"
+    };
+  }
+
+  let orderBy: any = {
+    createdAt: "desc"
+  };
+
+  // sorting
+  if(sort === "price_asc") {
+    orderBy = {
+      price: "asc"
+    };
+  } else if (sort === "price_desc") {
+    orderBy = {
+      price: "desc"
+    };
+  }
+
   const products = await prisma.product.findMany({
+    where,
     skip,
     take: limits,
-    orderBy: {
-      createdAt: "desc"
-    }
+    orderBy
   });
 
-  const totalProducts = await prisma.product.count();
+  const totalProducts = await prisma.product.count({ where });
 
   return {
     data: products,

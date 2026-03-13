@@ -5,10 +5,18 @@ import {createProductService, getProductService, getProductByIdService, updatePr
 // public routes
 export const getProducts = async (req: Request, res: Response) => {
   try {
-    const page = Number(req.query.page);
-    const limit = Number(req.query.limit);
+    let page = Number(req.query.page);
+    let limit = Number(req.query.limit);
 
-    const {data, pagination } = await getProductService(page, limit);
+    // sanitize inputs
+    if (isNaN(page) || page < 1) page = 1;
+    if (isNaN(limit) || limit < 1 || limit > 50) limit = 10;
+
+    const category = req.query.category as string;
+    const search = req.query.search as string;
+    const sort = req.query.sort as string;
+
+    const {data, pagination } = await getProductService(page, limit, category, search, sort);
 
     res.json({
       success: true,
