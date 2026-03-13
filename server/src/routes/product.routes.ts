@@ -8,14 +8,13 @@ const router = express.Router();
 
 // /v1/api/auth/products
 
-// public routes
 router.get("/", getProducts);
-router.get("/:id", getProductById);
 
-// admin routes
+router.get("/admin/products", protectRoute, adminOnly, getAdminProducts);
 router.post("/", protectRoute, adminOnly, validatedProduct, createProduct);
 router.patch("/:id", protectRoute, adminOnly, validatedProduct, updateProduct);
 router.delete("/:id", protectRoute, adminOnly, deleteProduct);
-router.get("/admin/products", protectRoute, adminOnly, getAdminProducts);
+
+router.get("/:id", getProductById);
 
 export default router;
