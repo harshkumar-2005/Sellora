@@ -139,6 +139,27 @@ model Review {
   @@unique([userId, productId]) // one review per user per product
 }
 
+model OtpVerification {
+  id          Int     @id @default(autoincrement())
+
+  identifier  String
+  token       String
+  type        VerificationType
+  
+  attempts    Int     @default(0)
+  
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([identifier, type])
+}
+
+enum VerificationType {
+  SIGNUP
+  PAYMENT
+  PASSWORD_RESET
+}
+
 enum OrderStatus {
   PENDING
   CONFIRMED
