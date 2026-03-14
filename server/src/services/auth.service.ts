@@ -167,3 +167,35 @@ export const logoutService = async (token: string) => {
    }
  }
 };
+
+export const resetPasswordService = async (email: string, newPassword: string, otp: string) => {
+
+  const verifyOtp = await prisma.otpVerification.findFirst({
+    where: {
+      identifier: email,
+      token: otp,
+      type: "PASSWORD_RESET",
+      expiresAt: {
+        gt: new Date()
+      }
+    }
+  });
+
+  if (!verifyOtp) {
+    throw new Error("Invalid or expired OTP");
+  }
+
+  const hashedPassword = await argon2.hash(newPassword);
+
+  const updatedUser = await prisma.user.update({
+    where: { email },
+    data: { password: hashedPassword }
+  });
+
+  // Prevent OTP reuse
+  await prisma.otpVerification.delete({
+    where: { id: verifyOtp.id }
+  });
+
+  return updatedUser;
+};

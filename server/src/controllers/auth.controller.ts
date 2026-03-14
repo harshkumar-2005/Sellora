@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../types/express.types.js";
-import { signupUserService,loginUserService,getUserService, refreshTokenService, logoutService } from "../services/auth.service.js";
+import { signupUserService,loginUserService,getUserService, refreshTokenService, logoutService, resetPasswordService } from "../services/auth.service.js";
 import validSignup from "../validators/signup.validator.js";
 import validLogin from "../validators/login.validator.js";
 import { ZodError } from "zod";
@@ -148,4 +148,42 @@ export const logout = async (req: AuthRequest, res: Response) => {
     success: true,
     message: "Logout successfully"
   });
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+
+    const { email, newPassword, confirmPassword, otp } = req.body;
+
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required fields"
+      });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Passwords do not match"
+      });
+    }
+
+    await resetPasswordService(email, newPassword, otp);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successful"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+
+  }
 };
