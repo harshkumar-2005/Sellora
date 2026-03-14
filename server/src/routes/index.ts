@@ -4,11 +4,14 @@ import productRoutes from "./product.routes.js";
 import cartRoutes from "./cart.routes.js";
 import orderRoutes from "./order.routes.js";
 import wishlistRoutes from "./wishlist.routes.js";
-import reviewRoutes from "./review.routes.js"
+import reviewRoutes from "./review.routes.js";
+import otpRoutes from "./otp.routes.js";
 
 const router = Router();
 
 router.use("/auth", authRoutes);
+
+router.use("/otp", otpRoutes);
 
 router.use("/products", productRoutes);
 
