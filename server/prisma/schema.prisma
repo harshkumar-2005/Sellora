@@ -23,15 +23,35 @@ model User {
   refreshTokens RefreshToken[]
   orders        Order[]
   reviews       Review[]
+  addresses     Address[]
 
   @@index([email])
+}
+
+model Address {
+  id Int @id @default(autoincrement())
+
+  userId Int
+  name String
+  phone String
+
+  line1 String
+  line2 String?
+  city String
+  state String
+  postalCode String
+  country String
+
+  user User @relation(fields:[userId], references:[id])
+
+  createdAt DateTime @default(now())
 }
 
 model Product {
   id          Int     @id @default(autoincrement())
   name        String
   description String?
-  price       Float
+  price       Int
   stock       Int
   imageUrl    String? // optional
   category    String? // optional
@@ -79,8 +99,17 @@ model RefreshToken {
 model Order {
   id          Int       @id @default(autoincrement())
   userId      Int
-  totalAmount Float
+  totalAmount Int
   status      OrderStatus @default(PENDING)
+
+  shippingName       String
+  shippingPhone      String
+  shippingLine1      String
+  shippingLine2      String?
+  shippingCity       String
+  shippingState      String
+  shippingPostalCode String
+  shippingCountry    String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -88,16 +117,17 @@ model Order {
   user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   items OrderItem[]
 
+  payment Payment?
+
   @@index([userId])
 }
-
 model OrderItem {
   id        Int @id @default(autoincrement())
 
   orderId   Int
   productId Int
   quantity  Int
-  price     Float
+  price     Int
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
@@ -152,6 +182,41 @@ model OtpVerification {
   createdAt   DateTime @default(now())
 
   @@index([identifier, type])
+}
+
+model Payment {
+  id                Int      @id @default(autoincrement())
+
+  orderId           Int      @unique
+  provider          PaymentProvider
+  providerOrderId   String   @unique
+  providerPaymentId String?  @unique
+
+  paymentMethod     String?
+
+  amount            Int
+  currency          String   @default("INR")
+
+  status            PaymentStatus @default(PENDING)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+enum PaymentProvider {
+  RAZORPAY
+  STRIPE
+  COD
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
 }
 
 enum VerificationType {
