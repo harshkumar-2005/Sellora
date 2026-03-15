@@ -26,3 +26,5 @@ Build a scalable, secure, and user-friendly ecommerce platform for seamless onli
 - Admin endpoints for product and order management
 - Validation and error handling
 - Deployment-ready structure
+
+![schema_image](image.png)
