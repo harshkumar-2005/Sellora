@@ -22,11 +22,29 @@ export const checkoutService = async (userId: number) => {
     return total + item.quantity * item.product.price;
   }, 0);
 
+  // Fetch user's default address
+  const address = await prisma.address.findFirst({
+    where: { userId },
+    orderBy: { id: "asc" }, // assuming first address is default
+  });
+
+  if (!address) {
+    throw new Error("No address found for user");
+  }
+
   const order = await prisma.order.create({
     data: {
       userId,
       totalAmount,
       status: OrderStatus.PENDING,
+      shippingName: address.name,
+      shippingPhone: address.phone,
+      shippingLine1: address.line1,
+      shippingLine2: address.line2 ?? "",
+      shippingCity: address.city,
+      shippingState: address.state,
+      shippingPostalCode: address.postalCode,
+      shippingCountry: address.country,
       items: {
         create: cartItems.map((item) => ({
           productId: item.productId,
@@ -47,28 +65,31 @@ export const checkoutService = async (userId: number) => {
   return order;
 };
 
-export const getUserOrdersService = async (userId: number, page: number, limit: number) => {
-
+export const getUserOrdersService = async (
+  userId: number,
+  page: number,
+  limit: number,
+) => {
   const { pages, limits, skip } = getPagination(page, limit);
 
   const orders = await prisma.order.findMany({
     where: {
-      userId
+      userId,
     },
     skip,
     take: limits,
     orderBy: {
-      createdAt: "desc"
+      createdAt: "desc",
     },
     include: {
-      items: true
-    }
+      items: true,
+    },
   });
 
   const totalOrders = await prisma.order.count({
     where: {
-      userId
-    }
+      userId,
+    },
   });
 
   return {
@@ -77,21 +98,17 @@ export const getUserOrdersService = async (userId: number, page: number, limit: 
       page: pages,
       limit: limits,
       total: totalOrders,
-      totalPages: Math.ceil(totalOrders / limits)
-    }
+      totalPages: Math.ceil(totalOrders / limits),
+    },
   };
 };
 
-export const getOrderByIdService = async (
-  orderId: number,
-  userId: number
-) => {
-
+export const getOrderByIdService = async (orderId: number, userId: number) => {
   const order = await prisma.order.findFirst({
     where: {
       id: orderId,
-      userId: userId
-    }
+      userId: userId,
+    },
   });
 
   if (!order) {
@@ -102,19 +119,18 @@ export const getOrderByIdService = async (
 };
 
 export const getAllOrdersAdminService = async (page: number, limit: number) => {
-
   const { pages, limits, skip } = getPagination(page, limit);
 
   const orders = await prisma.order.findMany({
     skip,
     take: limits,
     orderBy: {
-      createdAt: "desc"
+      createdAt: "desc",
     },
     include: {
       items: true,
-      user: true
-    }
+      user: true,
+    },
   });
 
   const totalOrders = await prisma.order.count();
@@ -125,16 +141,18 @@ export const getAllOrdersAdminService = async (page: number, limit: number) => {
       page: pages,
       limit: limits,
       total: totalOrders,
-      totalPages: Math.ceil(totalOrders / limits)
-    }
+      totalPages: Math.ceil(totalOrders / limits),
+    },
   };
 };
 
-export const updateOrderStatusService = async (orderId: number, status: OrderStatus) => {
-
+export const updateOrderStatusService = async (
+  orderId: number,
+  status: OrderStatus,
+) => {
   if (!Object.values(OrderStatus).includes(status)) {
-  throw new Error("Invalid order status");
-}
+    throw new Error("Invalid order status");
+  }
   const order = await prisma.order.update({
     where: { id: orderId },
     data: { status },
